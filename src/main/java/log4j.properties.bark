@@ -1,0 +1,12 @@
+# Set specific logger levels.
+log4j.logger.org.mortbay.log=fatal
+log4j.logger.org.apache.http=fatal
+log4j.logger.org.apache.http.headers=fatal
+log4j.logger.org.apache.http.wire=fatal
+# For HttpClient 3, which is used by FirefoxDriver
+log4j.logger.httpclient.wire=fatal
+log4j.logger.org.apache.commons=fatal
+log4j.logger.com.gargoylesoftware.htmlunit=fatal
+log4j.logger.com.gargoylesoftware.htmlunit.WebTestCase=fatal
+# Change this to TRACE when enabling the debugger.
+log4j.logger.com.gargoylesoftware.htmlunit.javascript.DebugFrameImpl=fatal
