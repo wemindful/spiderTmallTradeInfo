@@ -5,19 +5,27 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import org.apache.pdfbox.jbig2.util.log.Logger;
 import org.apache.pdfbox.jbig2.util.log.LoggerFactory;
 
 import com.dgw.bimgcollection.utils.Base64Image2String;
+import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlImage;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
 /**
  * @author DGW-PC
@@ -30,8 +38,9 @@ public class GetBusinessImgService {
 	/**
 	 * 需要识别的数据
 	 */
-	 private static BufferedImage buffimg;
+	private static BufferedImage buffimg;
 
+	
 	public static void main(String[] args) {
 		// return GenerateBImage();
 	}
@@ -42,48 +51,93 @@ public class GetBusinessImgService {
 	 * @param vcodeaddress  工商图片提取页的地址
 	 * @return boolean 是否成功
 	 */
+	@SuppressWarnings("resource")
 	public  boolean GenerateBImage(String filepath,String vcodeaddress) {
 		GetVerificationImg verificationImg = new GetVerificationImg();
 		 //验证码表单
 		 HtmlForm form = verificationImg.getVerfImgForm(vcodeaddress);
 		 buffimg = verificationImg.getBuffimg();
-		 
 		 List<HtmlElement> list = form.getElementsByAttribute("input", "name", "checkCode");
 		 HtmlInput inputCode=null;//输入的验证码
 		 for (HtmlElement temp : list) {
 				if(temp.getAttribute("name").equals("checkCode")) {
-					logger.info("获取验证码输入text标签");
+					logger.info("======>>获取验证码输入text标签");
 					inputCode=(HtmlInput) temp;
 				}
 		}
-	    HtmlButton submit=null;
-		DomNodeList<HtmlElement> btnList = form.getElementsByTagName("button");
-		for (HtmlElement temp : btnList) {
-			if(temp.getAttribute("class").equals("short-btn")) {
-				logger.info("获取验证码的提交按钮");
-				submit=(HtmlButton) temp;
-			}
+		HtmlButton submit = (HtmlButton) form.getElementsByAttribute("button", "class", "short-btn").get(0);
+		//识别
+		//String code = new DistinguishVerCode().getProbableCode(buffimg);
+		HtmlImage element = (HtmlImage) form.getElementsByTagName("img").get(0);
+		try {
+			ImageReader imageRea = element.getImageReader();
+			buffimg = imageRea.read(0);
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
-		String code = new DistinguishVerCode().getProbableCode(buffimg);
-		inputCode.setValueAttribute(code);
+		JFrame f2 = new JFrame();
+		f2.setAlwaysOnTop(true);
+		JLabel l = new JLabel();
+		l.setIcon(new ImageIcon(buffimg));
+		f2.getContentPane().add(l);
+		f2.setSize(100, 100);
+		f2.setTitle("验证码二次验证");
+		f2.setVisible(true);
+		
+		//设置破解验证码
+		Scanner sc = new Scanner(System.in);
+		String  trim= sc.next().trim();
+		try {
+			String st = new String(trim.getBytes(),"GBK");
+			inputCode.click();
+			inputCode.type(st);
+			//inputCode.setValueAttribute(st);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		for (HtmlElement temp : list) {
+			if(temp.getAttribute("name").equals("checkCode")) {
+				logger.info("表单验证是否输入：");
+				inputCode=(HtmlInput) temp;
+				String string = inputCode.getValueAttribute();
+				System.out.println(string);
+			}
+	   }
 		try {
 			//验证是否拿到工商图片页面
+			logger.info("=======>>执行破解验证码操作");
 			HtmlPage page = submit.click();
+			WebRequest request = form.getWebRequest(submit);
+			List<NameValuePair> parameters = request.getRequestParameters();
+			for (NameValuePair nameValuePair : parameters) {
+				System.out.println(nameValuePair.getName()+" "+nameValuePair.getValue());
+			}
 			HtmlElement body = page.getBody();
-			DomNodeList<HtmlElement> imglist = body.getElementsByTagName("image");
+			System.out.println(body.asXml());
+			DomNodeList<HtmlElement> imglist = body.getElementsByTagName("img");
 			//实际页面只有一个img ，没有即为没有通过验证码
 			if(imglist.isEmpty()) {
-				logger.info("本次尝试失败 ，请求再一次尝试验证");
+				logger.info("=======>>本次尝试失败 ，请求再一次尝试验证");
 				return false;
 			}else {
-				logger.info("破解成功 开始下载图片------>");
+				logger.info("=======>>破解成功 开始下载图片------>");
 				HtmlElement img = imglist.get(0);
+				logger.info(img.asXml());
+				FileOutputStream stream = new FileOutputStream("z://1.txt");
+				stream.write(img.asXml().getBytes());
 				String base64ImgData = img.getAttribute("src");
-				base64ImgData = base64ImgData.replace("data:image/png;base64,", "");
-				BufferedImage image = Base64Image2String.generateBufferImage(base64ImgData);
-				BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(filepath));
+				logger.info("=======>>下载成功，开始解析图片------>");
+				base64ImgData= base64ImgData.split(",")[1];
+				BufferedImage image = Base64Image2String.generateBuffer(base64ImgData);
+				FileOutputStream out = new FileOutputStream(filepath);
+				BufferedOutputStream os = new BufferedOutputStream(out);
 				ImageIO.write(image, "png", os);
+				logger.info("=======>>写出图片"+ filepath.substring(filepath.lastIndexOf('\\'))+"成功");
+				logger.info("=======>>开始下一次操作\n\n\n");
 			}
+			return true;
 		} catch (IOException e) {
 			logger.info("提交验证码失败");
 			e.printStackTrace();

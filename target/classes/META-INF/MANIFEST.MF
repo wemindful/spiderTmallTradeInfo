@@ -1,6 +1,5 @@
 Manifest-Version: 1.0
 Built-By: DGW-PC
-Build-Jdk: 10.0.1
 Class-Path: lib/jna-4.5.1.jar lib/tess4j-4.0.2.jar lib/jai-imageio-cor
  e-1.4.0.jar lib/ghost4j-1.0.1.jar lib/commons-beanutils-1.9.2.jar lib
  /commons-collections-3.2.1.jar lib/xmlgraphics-commons-1.4.jar lib/it
@@ -21,6 +20,7 @@ Class-Path: lib/jna-4.5.1.jar lib/tess4j-4.0.2.jar lib/jai-imageio-cor
  httpclient-4.5.2.jar lib/httpcore-4.4.4.jar lib/commons-codec-1.9.jar
   lib/slf4j-api-1.7.21.jar lib/slf4j-log4j12-1.7.21.jar lib/log4j-1.2.
  17.jar
-Main-Class: main.App
+Build-Jdk: 1.8.0_91
 Created-By: Maven Integration for Eclipse
+Main-Class: main.App
 

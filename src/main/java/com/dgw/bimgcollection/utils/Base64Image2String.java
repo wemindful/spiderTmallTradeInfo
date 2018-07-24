@@ -4,18 +4,16 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
 
 import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
 
 public class Base64Image2String {
 
@@ -44,6 +42,7 @@ public class Base64Image2String {
 			}
 			ByteArrayInputStream ais = new ByteArrayInputStream(buffer);
 			image = ImageIO.read(ais);
+			ais.close();
 			return image;
 		} catch (IOException e) {
 		}
@@ -51,34 +50,59 @@ public class Base64Image2String {
 	}
 
 	/**
-	 * @Description: 将base64编码字符串转换为图片
-	 * @Author: 
-	 * @CreateTime: 
-	 * @param imgStr base64编码字符串
-	 * @param path 图片路径-具体到文件
-	 * @return
-	*/
-	public static boolean generateImage(String imgStr, String path) {
-			if (imgStr == null)
-				return false;
-			// 解密
+	 * @Description: 将base64编码字符串转换为bufferimage
+	 * @param imgbase64Str base64编码字符串
+	 * @return BufferedImage
+	 */
+	public static BufferedImage generateBuffer(String imgbase64Str) {
+		if (imgbase64Str == null || imgbase64Str.equals("")) {
 			try {
-				Decoder decoder = Base64.getDecoder();
-				byte[] b = decoder.decode(imgStr);
-				 // 处理数据
-				for (int i = 0; i < b.length; ++i) {
-					if (b[i] < 0) {
-					b[i] += 256;
-					}
-				}
-				OutputStream out = new FileOutputStream(path);
-				out.write(b);
-				out.flush();
-				out.close();
-				return true;
-			} catch (IOException e) {
-				return false;
+				throw new Exception("编码为NULL");
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
+		}
+		BufferedImage image = null;
+		try {
+			byte[] base64Binary = DatatypeConverter.parseBase64Binary(imgbase64Str);
+			ByteArrayInputStream imgArray = new ByteArrayInputStream(base64Binary);
+			image = ImageIO.read(imgArray);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return image;
+		// 解密
+	}
+
+	/**
+	 * @Description: 将base64编码字符串转换为图片
+	 * @Author:
+	 * @CreateTime:
+	 * @param imgStr base64编码字符串
+	 * @param path   图片路径-具体到文件
+	 * @return
+	 */
+	public static boolean generateImage(String imgStr, String path) {
+		if (imgStr == null)
+			return false;
+		// 解密
+		try {
+			Decoder mimeDecoder = Base64.getMimeDecoder();
+			byte[] b = mimeDecoder.decode(imgStr);
+			// 处理数据
+			for (int i = 0; i < b.length; ++i) {
+				if (b[i] < 0) {
+					b[i] += 256;
+				}
+			}
+			OutputStream out = new FileOutputStream(path);
+			out.write(b);
+			out.flush();
+			out.close();
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 	/**
@@ -99,28 +123,19 @@ public class Base64Image2String {
 			e.printStackTrace();
 		}
 		// 加密
-		Encoder encoder = Base64.getEncoder();
+		Encoder encoder = Base64.getMimeEncoder();
 		return encoder.encodeToString(data);
 	}
 
 	/**
-	 * @throws UnsupportedEncodingException
-	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
-	@SuppressWarnings("resource")
-	public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException {
-		String strImg = getImageStr("Z:\\ˮӡ\\2.bmp");
-		System.out.println(strImg);
-		File file = new File("z://1.txt");
-		FileOutputStream fos = new FileOutputStream(file);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-		try {
-			osw.write(strImg);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// generateImage(strImg, "Z:\\ˮӡ\\444.bmp");
-
+	public static void main(String[] args) throws IOException {
+		String strImg = getImageStr("z://001.jpg");
+		String string = strImg.split(",")[1];
+		byte[] bs = DatatypeConverter.parseBase64Binary(string);
+		BufferedImage image = ImageIO.read(new ByteArrayInputStream(bs));
+		ImageIO.write(image, "png", new File("z://java.png"));
 	}
+
 }

@@ -1,7 +1,6 @@
 package com.dgw.bimgcollection.utils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 import org.junit.Test;

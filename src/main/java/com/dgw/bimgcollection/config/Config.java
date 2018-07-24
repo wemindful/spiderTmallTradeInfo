@@ -11,7 +11,7 @@ public interface Config {
 	/**
 	 * 天猫验证码获取图片 每一个商品的地址是固定的 网址
 	 */
-	String SRCIMGURI = "https://zhaoshang.tmall.com/maintaininfo/liangzhao.htm?spm=a220o.1000855.1997427721.5.6174cbddUnBdbY&xid=1183a425054ac0d2943d9c02db4668db";
+	String SRCIMGURI = "https://zhaoshang.tmall.com/maintaininfo/liangzhao.htm?spm=a1z10.3-b.1997427721.5.6c0022137xgjdp&xid=cbf9e3741d9ae9cbc71c28214438cf74";
 	
 	/**
 	 * 天猫验证码/index.html
@@ -27,12 +27,12 @@ public interface Config {
 	/**
 	 * JLInF 引擎执行Js的延迟时间 15000
 	 */
-	Integer POSTPONE=15000;
+	Integer POSTPONE=10000;
 	
 	/**
 	 * 工商图片测试地址 
 	 */
-	String gongshang="https://zhaoshang.tmall.com/maintaininfo/liangzhao.htm?spm=a1z10.3741-b-s.1997427721.5.4aaa2d8LsuX7E&xid=92e1adf6003bc453eae5091e911951ad";
+	String gongshang="https://zhaoshang.tmall.com/maintaininfo/liangzhao.htm?_tb_token_=e4e3e3de91e7e&checkCode=nrzb&xid=a753b91b0273fc01b15f1815c4c3fc23";
 	
 	/**
 	 * 

@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.dgw.bimgcollection.config.Config;
 
+import net.sourceforge.tess4j.ITessAPI.TessOcrEngineMode;
 import net.sourceforge.tess4j.Tesseract;
 /**
  * @Description:  单例工具类
@@ -48,6 +49,7 @@ public class TesseractUtil {
         Tesseract instance = getInstance();
         instance.setLanguage(languageName);
         instance.setDatapath(Config.TESSDATA);
+        instance.setOcrEngineMode(TessOcrEngineMode.OEM_LSTM_ONLY);
         return instance;
     }
 

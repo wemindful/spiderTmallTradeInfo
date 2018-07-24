@@ -14,9 +14,9 @@ public class App
        GetBusinessImgService imgService = new GetBusinessImgService();
        
        	while(true) {
-       		boolean b = imgService.GenerateBImage("Z:\\222.png", Config.SRCIMGURI);
+       		boolean b = imgService.GenerateBImage("Z:\\公司.png", Config.SRCIMGURI);
        		if(b) {
-       			break;
+       			System.exit(0);
        		}
        	}
        
