@@ -63,9 +63,9 @@ public class GetTaoBaoSession {
 			//忽略ssl认证
 			client.getOptions().setUseInsecureSSL(true);	
 			// 屏蔽掉异常
-			client.getOptions().setThrowExceptionOnFailingStatusCode(true);
+			client.getOptions().setThrowExceptionOnFailingStatusCode(false);
 			client.getOptions().setThrowExceptionOnScriptError(false);
-			client.getOptions().setPrintContentOnFailingStatusCode(true);
+			client.getOptions().setPrintContentOnFailingStatusCode(false);
 			// 设置连接超时时间 ，这里是10S。如果为0，则无限期
 			client.getOptions().setTimeout(8000);
 			client.setJavaScriptTimeout(5000);

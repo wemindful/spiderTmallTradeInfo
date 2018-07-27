@@ -11,13 +11,8 @@ import org.apache.commons.logging.LogFactory;
  * @description 
  */
 public class LogConfig {
-		
-	
-
 	void test() {
 		 LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log","org.apache.commons.logging.impl.NoOpLog");
 		 java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF);
 	}
-	
-
 }

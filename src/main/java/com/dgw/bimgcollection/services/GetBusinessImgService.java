@@ -2,6 +2,7 @@ package com.dgw.bimgcollection.services;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -17,7 +18,6 @@ import org.apache.pdfbox.jbig2.util.log.Logger;
 import org.apache.pdfbox.jbig2.util.log.LoggerFactory;
 
 import com.dgw.bimgcollection.utils.Base64Image2String;
-import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -25,7 +25,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlImage;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
 /**
  * @author DGW-PC
@@ -39,6 +38,11 @@ public class GetBusinessImgService {
 	 * 需要识别的数据
 	 */
 	private static BufferedImage buffimg;
+	
+	/**
+	 * 手动输入验证开关 
+	 */
+	public static boolean switchOnVerCode=true;
 
 	
 	public static void main(String[] args) {
@@ -66,8 +70,7 @@ public class GetBusinessImgService {
 				}
 		}
 		HtmlButton submit = (HtmlButton) form.getElementsByAttribute("button", "class", "short-btn").get(0);
-		//识别
-		//String code = new DistinguishVerCode().getProbableCode(buffimg);
+		
 		HtmlImage element = (HtmlImage) form.getElementsByTagName("img").get(0);
 		try {
 			ImageReader imageRea = element.getImageReader();
@@ -75,28 +78,19 @@ public class GetBusinessImgService {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		JFrame f2 = new JFrame();
-		f2.setAlwaysOnTop(true);
-		JLabel l = new JLabel();
-		l.setIcon(new ImageIcon(buffimg));
-		f2.getContentPane().add(l);
-		f2.setSize(100, 100);
-		f2.setTitle("验证码二次验证");
-		f2.setVisible(true);
-		
-		//设置破解验证码
-		Scanner sc = new Scanner(System.in);
-		String  trim= sc.next().trim();
-		try {
-			String st = new String(trim.getBytes(),"GBK");
-			inputCode.click();
-			inputCode.type(st);
-			//inputCode.setValueAttribute(st);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		//是否手动或者自动输入验证码
+		if(switchOnVerCode) {
+			manualVerCode(inputCode);
+		}else {
+			//识别
+			String code = new DistinguishVerCode().getProbableCode(buffimg);
+			try {
+				inputCode.click();
+				inputCode.type(code);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
 		for (HtmlElement temp : list) {
 			if(temp.getAttribute("name").equals("checkCode")) {
 				logger.info("表单验证是否输入：");
@@ -108,21 +102,25 @@ public class GetBusinessImgService {
 		try {
 			//验证是否拿到工商图片页面
 			logger.info("=======>>执行破解验证码操作");
-			HtmlPage page = submit.click();
-			WebRequest request = form.getWebRequest(submit);
-			List<NameValuePair> parameters = request.getRequestParameters();
+			HtmlPage mainimagepage = submit.click();
+			// 查看formh header参数
+			/*
+			 WebRequest request = form.getWebRequest(submit);
+			 List<NameValuePair> parameters = request.getRequestParameters();
 			for (NameValuePair nameValuePair : parameters) {
 				System.out.println(nameValuePair.getName()+" "+nameValuePair.getValue());
-			}
-			HtmlElement body = page.getBody();
-			System.out.println(body.asXml());
-			DomNodeList<HtmlElement> imglist = body.getElementsByTagName("img");
+			}*/
+			HtmlElement mainimagebody = mainimagepage.getBody();
+			logger.debug(mainimagebody.asXml());
+			
+			List<HtmlElement> codepanel = mainimagebody.getElementsByAttribute("div", "class", "code-panel");
 			//实际页面只有一个img ，没有即为没有通过验证码
-			if(imglist.isEmpty()) {
+			if(!codepanel.isEmpty()) {
 				logger.info("=======>>本次尝试失败 ，请求再一次尝试验证");
 				return false;
 			}else {
 				logger.info("=======>>破解成功 开始下载图片------>");
+				DomNodeList<HtmlElement> imglist = mainimagebody.getElementsByTagName("img");
 				HtmlElement img = imglist.get(0);
 				logger.info(img.asXml());
 				FileOutputStream stream = new FileOutputStream("z://1.txt");
@@ -134,7 +132,7 @@ public class GetBusinessImgService {
 				FileOutputStream out = new FileOutputStream(filepath);
 				BufferedOutputStream os = new BufferedOutputStream(out);
 				ImageIO.write(image, "png", os);
-				logger.info("=======>>写出图片"+ filepath.substring(filepath.lastIndexOf('\\'))+"成功");
+				logger.info("=======>>写出图片"+ filepath.substring(filepath.lastIndexOf(File.separator))+"成功");
 				logger.info("=======>>开始下一次操作\n\n\n");
 			}
 			return true;
@@ -143,6 +141,33 @@ public class GetBusinessImgService {
 			e.printStackTrace();
 		}
 		return true;
+	}
+
+	/**
+	 * pandaun 
+	 * @param inputCode void 验证码输入标签
+	 */
+	private void manualVerCode(HtmlInput inputCode) {
+		JFrame f2 = new JFrame("验证码输入验证");
+		f2.setAlwaysOnTop(true);
+		JLabel l = new JLabel();
+		l.setIcon(new ImageIcon(buffimg));
+		f2.getContentPane().add(l);
+		f2.setSize(100, 100);
+		f2.setVisible(true);
+		
+		//设置破解验证码
+		Scanner sc = new Scanner(System.in);
+		String  trim= sc.next().trim();
+		try {
+			String st = new String(trim.getBytes(),"GBK");
+			inputCode.click();
+			inputCode.type(st);
+			f2.setVisible(false);
+			f2.dispose();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 }
 

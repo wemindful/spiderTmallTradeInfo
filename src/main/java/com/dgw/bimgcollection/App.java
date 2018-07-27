@@ -1,24 +1,17 @@
 package com.dgw.bimgcollection;
 
-import com.dgw.bimgcollection.config.Config;
-import com.dgw.bimgcollection.services.GetBusinessImgService;
 
 /**
- * Hello world!
- *
+ * @author DGW-PC
+ * @data   2018年7月25日下午11:01:39
+ * <a href="https://www.cnblogs.com/dgwblog/">我的博客</a>
+ * Main
  */
-public class App 
-{
-    public static void main( String[] args )
-    {
-       GetBusinessImgService imgService = new GetBusinessImgService();
-       
-       	while(true) {
-       		boolean b = imgService.GenerateBImage("Z:\\公司.png", Config.SRCIMGURI);
-       		if(b) {
-       			System.exit(0);
-       		}
-       	}
-       
-    }
+public class App {
+	
+	
+	public static void main(String[] args) {
+		AppServices services = new AppServices();
+		services.start();
+	}
 }

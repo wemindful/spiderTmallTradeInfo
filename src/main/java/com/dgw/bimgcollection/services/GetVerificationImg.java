@@ -7,9 +7,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -99,14 +96,6 @@ public class GetVerificationImg {
 		try {
 			ImageReader imageRea = valiCodeImg.getImageReader();
 			buffimg = imageRea.read(0);
-			JFrame f2 = new JFrame();
-			f2.setAlwaysOnTop(true);
-			JLabel l = new JLabel();
-			l.setIcon(new ImageIcon(buffimg));
-			f2.getContentPane().add(l);
-			f2.setSize(100, 100);
-			f2.setTitle("验证码1");
-			f2.setVisible(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

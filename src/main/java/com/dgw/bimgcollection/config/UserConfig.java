@@ -25,6 +25,10 @@ public class UserConfig {
 	 */
 	private static String passwd;
 	
+	/**
+	 *  自动手动开关
+	 */
+	private static String VerOption;
 	/*
 	 * 文件路径
 	 */
@@ -41,13 +45,13 @@ public class UserConfig {
 			pro.load(isr);
 			usernmae= pro.getProperty("用户名");
 			passwd = pro.getProperty("密码");
-			
+			VerOption=pro.getProperty("自动手动开关");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 构造配置文件数据
 	 */
@@ -55,10 +59,12 @@ public class UserConfig {
 		Properties pro = new Properties();
 		pro.setProperty("用户名", "sss");
 		pro.setProperty("密码", "kkkk");
+		pro.setProperty("自动手动开关", "true");
 		try {
-		FileOutputStream os = new FileOutputStream(path+File.separator+"user.ini");
+		FileOutputStream os = new FileOutputStream(path+File.separator+"user.ini",false);
 		OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-			pro.store(osw, "必须写登录淘宝的用户名密码");
+		byte[] bs = new String("必须写登录淘宝的用户名密码").getBytes("UTF-8");
+			pro.store(osw, new String(bs));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -74,7 +80,11 @@ public class UserConfig {
 		Builder();
 		return passwd;
 	}
-
+	
+	public static String getVerOption() {
+		Builder();
+		return VerOption;
+	}
 	public static void main(String[] args) {
 		init();
 	}
