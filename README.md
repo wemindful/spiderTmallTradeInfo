@@ -34,4 +34,4 @@
 #### 待完善数据分类器
 
 #### 请我喝一杯茶
-![捐赠](https://imgchr.com/i/PswvEq)
+![PswvEq.png](https://s1.ax1x.com/2018/08/08/PswvEq.png)
