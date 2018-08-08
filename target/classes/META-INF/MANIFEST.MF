@@ -23,7 +23,7 @@ Class-Path: lib/jna-4.5.1.jar lib/jxl-2.6.12.jar lib/log4j-1.2.14.jar
  .jar lib/jsoup-1.11.3.jar lib/httpclient-4.5.2.jar lib/httpcore-4.4.4
  .jar lib/commons-codec-1.9.jar lib/slf4j-api-1.7.21.jar lib/slf4j-log
  4j12-1.7.21.jar
-Build-Jdk: 1.8.0_91
+Build-Jdk: 1.8.0_181
 Created-By: Maven Integration for Eclipse
 Main-Class: main.App
 
