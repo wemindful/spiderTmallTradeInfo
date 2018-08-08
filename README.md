@@ -32,3 +32,6 @@
 4. 新建 Pull Request
 
 #### 待完善数据分类器
+
+#### 请我喝一杯茶
+![捐赠](https://imgchr.com/i/PswvEq)
